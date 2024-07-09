@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workstation Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 20px; /* Spazio generico tra le colonne */
+        }
+        .workstation {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+        }
+        .green {
+            background-color: green;
+            color: white;
+        }
+        .red {
+            background-color: red;
+            color: white;
+        }
+        .blue {
+            background-color: blue;
+            color: white;
+        }
+        .linea-label {
+            margin-bottom: 5px; /* Spazio tra la label e le workstation */
+        }
+
+        /* Regola lo spazio tra le colonne specifiche */
+        #linea2-col {
+            margin-left: 0px; /* Rimuove lo spazio tra LINEA e 1 */
+            margin-right: 80px; /* Spazio maggiore tra 1 e LINEA */
+        }
+        #linea4-col {
+            margin-left: 0px; /* Rimuove lo spazio tra 2 e 3 */
+            margin-right: 80px; /* Spazio maggiore tra 3 e LINEA */
+        }
+        #linea6-col {
+            margin-left: 0px; /* Rimuove lo spazio tra 3 e 4 */
+            margin-right: 80px; /* Spazio maggiore tra 4 e LINEA */
+        }
+        #linea8-col {
+            margin-left: 0px; /* Rimuove lo spazio tra 4 e fine pagina */
+        }
+    </style>
+</head>
+<body>
+    <!-- Aggiunto logo -->
+    <img src="/static/image/logo.jpg" alt="Logo" style="position: absolute; top: 10px; left: 10px;">
+
+    <!-- Aggiunto elemento audio -->
+    <audio id="alertSound">
+        <source src="/static/audio/alert.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="column">
+        <div class="linea-label">LINEA 1</div>
+        <div class="workstation-container" id="linea1-col"></div>
+    </div>
+    <div class="column">
+        <div class="linea-label"><br></div>
+        <div class="workstation-container" id="linea2-col"></div>
+    </div>
+    <div class="column">
+        <div class="linea-label">LINEA 2</div>
+        <div class="workstation-container" id="linea3-col"></div>
+    </div>
+    <div class="column">
+        <div class="linea-label"><br></div>
+        <div class="workstation-container" id="linea4-col"></div>
+    </div>
+    <div class="column">
+        <div class="linea-label">LINEA 3</div>
+        <div class="workstation-container" id="linea5-col"></div>
+    </div>
+    <div class="column">
+        <div class="linea-label"><br></div>
+        <div class="workstation-container" id="linea6-col"></div>
+    </div>
+    <div class="column">
+        <div class="linea-label">LINEA 4</div>
+        <div class="workstation-container" id="linea7-col"></div>
+    </div>
+    <div class="column">
+        <div class="linea-label"><br></div>
+        <div class="workstation-container" id="linea8-col"></div>
+    </div>
+
+    <script>
+        const linea1ColDiv = document.getElementById('linea1-col');
+        const linea2ColDiv = document.getElementById('linea2-col');
+        const linea3ColDiv = document.getElementById('linea3-col');
+        const linea4ColDiv = document.getElementById('linea4-col');
+        const linea5ColDiv = document.getElementById('linea5-col');
+        const linea6ColDiv = document.getElementById('linea6-col');
+        const linea7ColDiv = document.getElementById('linea7-col');
+        const linea8ColDiv = document.getElementById('linea8-col');
+        const alertSound = document.getElementById('alertSound');
+
+        let alertPlayed = false;
+
+        function createWorkstation(id, status) {
+            const workstation = document.createElement('div');
+            workstation.className = `workstation ${status}`;
+            workstation.textContent = id;
+            workstation.onclick = () => {
+                window.location.href = `/workstation/${id}`;
+            };
+            return workstation;
+        }
+
+        function loadWorkstations() {
+            fetch('/workstations')
+                .then(response => response.json())
+                .then(data => {
+                    linea1ColDiv.innerHTML = '';
+                    linea2ColDiv.innerHTML = '';
+                    linea3ColDiv.innerHTML = '';
+                    linea4ColDiv.innerHTML = '';
+                    linea5ColDiv.innerHTML = '';
+                    linea6ColDiv.innerHTML = '';
+                    linea7ColDiv.innerHTML = '';
+                    linea8ColDiv.innerHTML = '';
+
+                    for (let i = 1; i <= 80; i++) {
+                        const status = data[i];
+                        const workstation = createWorkstation(i, status);
+
+                        if (i >= 1 && i <= 10) {
+                            linea1ColDiv.appendChild(workstation);
+                        } else if (i >= 11 && i <= 20) {
+                            linea2ColDiv.appendChild(workstation);
+                        } else if (i >= 21 && i <= 30) {
+                            linea3ColDiv.appendChild(workstation);
+                        } else if (i >= 31 && i <= 40) {
+                            linea4ColDiv.appendChild(workstation);
+                        } else if (i >= 41 && i <= 50) {
+                            linea5ColDiv.appendChild(workstation);
+                        } else if (i >= 51 && i <= 60) {
+                            linea6ColDiv.appendChild(workstation);
+                        } else if (i >= 61 && i <= 70) {
+                            linea7ColDiv.appendChild(workstation);
+                        } else if (i >= 71 && i <= 80) {
+                            linea8ColDiv.appendChild(workstation);
+                        }
+                    }
+                });
+
+            fetch('/check_alarm')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.alarm && !alertPlayed) {
+                        alertSound.play();
+                        alertPlayed = true;
+                    }
+                });
+        }
+
+        loadWorkstations();
+        setInterval(loadWorkstations, 3000); 
+    </script>
+</body>
+</html>
+
+
